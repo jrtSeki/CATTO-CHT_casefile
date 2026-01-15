@@ -1,0 +1,165 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  5                                     |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      fvSolution;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solvers
+{
+
+    "(p|pa|pb|pc)"
+    {
+        solver          GAMG;
+        tolerance       1e-9;
+        relTol          0.01;
+        smoother        GaussSeidel;
+    }
+
+    "(U|Ua|Ub|Uc|k|epsilon)"
+    {
+        // solver          smoothSolver;
+        // smoother        GaussSeidel;
+        // nSweeps         2;
+        // tolerance       1e-9;
+        // relTol          0.1;
+        solver          PBiCGStab;
+        preconditioner  DILU;
+        tolerance       1e-8;
+        relTol          0.01;
+    }
+
+     "(T|Ta|Tb)"
+    {
+        solver          PBiCGStab;
+        preconditioner  DILU;
+        tolerance       1e-9;
+        relTol          0.01;
+    }
+    "(gamma_p|fsens|gsens_U|gsensVol)"
+    {
+        solver          PCG;
+        preconditioner  DIC;
+        tolerance       1e-6;
+        relTol          0;
+    }
+        pFinal
+    {
+        $p;
+        relTol          0;
+    }
+        pbFinal
+    {
+        $pb;
+        relTol          0;
+    }
+        pcFinal
+    {
+        $pc;
+        relTol          0;
+    }
+
+    UFinal
+    {
+        $U;
+        relTol          0;
+    }
+
+    UbFinal
+    {
+        $Ub;
+        relTol          0;
+    }
+
+    UcFinal
+    {
+        $Uc;
+        relTol          0;
+    }
+
+    TFinal
+    {
+        $T;
+        relTol          0;
+    }
+    TbFinal
+    {
+        $Tb;
+        relTol          0;
+    }
+    gamma_pFinal
+    {
+        $gamma_p;
+        relTol          0;
+    }
+    fsensFinal
+    {
+        $fsens;
+        relTol          0;
+    }
+    gsens_UFinal
+    {
+        $gsens_U;
+        relTol          0;
+    }
+    gsensVolFinal
+    {
+        $gsensVol;
+        relTol          0;
+    }
+}
+
+PIMPLE
+{
+    //momentumPredictor no;
+    nOuterCorrectors 2;
+    nNonOrthogonalCorrectors 0;
+    nCorrectors       2;
+    pRefCell 0;
+    pRefValue 0;
+
+}
+// PISO
+// {
+//     nCorrectors     2;
+//     nNonOrthogonalCorrectors 0;
+//     pRefCell        0;
+//     pRefValue       0;
+// }
+relaxationFactors
+{
+    fields
+    {
+        "(p|pa|pb|pc)"     0.3;
+         alpha             0.1;
+    }
+    equations
+    {
+        "(U|Ua|Ub|Uc)"     0.7;
+        "(k|epsilon)"      0.7;
+    }
+
+}
+
+
+power_dissipation
+{
+    numberConstraintPatches      2;
+    constraintPatchesNames       (inlet outlet);
+}
+
+constraints
+{
+    number 2;
+}
+// ************************************************************************* //

@@ -1,0 +1,75 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  5                                     |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  | Upwind grad(Ta)                                                |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      fvSchemes;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+d2dt2Schemes
+{
+    default         backward;
+}
+
+ddtSchemes
+{
+    default         backward;
+}
+
+gradSchemes
+{
+    default         Gauss linear;
+    grad(D)         leastSquares;
+    grad(T)         Gauss weightedFlux DT;
+    grad(Tb)        Gauss weightedFlux DT;
+    grad(p)         Gauss linear;
+    grad(pb)         Gauss linear;
+    grad(pc)         Gauss linear;
+
+}
+
+divSchemes
+{
+    default         Gauss linear;
+
+    div(phi,U)      bounded Gauss upwind;
+    div(-phi,Ub)    bounded Gauss upwind;
+    div(-phi,Uc)    bounded Gauss upwind;
+    div(phi,T)      Gauss linearUpwind grad(T);
+    div(-phirhocp,Tb)     Gauss linearUpwind grad(Tb);
+    div((nuEff*dev2(T(grad(U))))) Gauss linear;
+}
+
+laplacianSchemes
+{
+    default         Gauss linear corrected;
+    laplacian(DT,T)  Gauss harmonic corrected;
+    laplacian(DT,Tb) Gauss harmonic corrected;
+}
+
+interpolationSchemes
+{
+    default         linear;
+}
+
+snGradSchemes
+{
+    default         orthogonal;
+}
+fluxRequired
+{
+    default         no;
+    p;
+    pb;
+    pc;
+}
+
+// ************************************************************************* //
